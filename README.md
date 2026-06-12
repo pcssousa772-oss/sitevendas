@@ -1,2 +1,0 @@
-# sitevendas
-site
