@@ -1,0 +1,1527 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DevStack — Catálogo de Serviços</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --accent: #7C3AED;
+    --accent-light: #EDE9FE;
+    --accent-dark: #5B21B6;
+    --bg: #0A0A0F;
+    --surface: #111118;
+    --surface2: #18181F;
+    --border: rgba(255,255,255,0.07);
+    --border-hover: rgba(124,58,237,0.4);
+    --text: #F5F5F7;
+    --muted: #8A8A9A;
+    --success: #10B981;
+    --warning: #F59E0B;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* HERO */
+  .hero {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 4rem 2rem;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    width: 700px; height: 700px;
+    background: radial-gradient(circle, rgba(124,58,237,0.18) 0%, transparent 70%);
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(124,58,237,0.15);
+    border: 1px solid rgba(124,58,237,0.3);
+    border-radius: 999px;
+    padding: 6px 16px;
+    font-size: 13px;
+    color: #C4B5FD;
+    margin-bottom: 2rem;
+    letter-spacing: 0.05em;
+  }
+
+  .hero-badge span { width: 6px; height: 6px; background: var(--success); border-radius: 50%; display: inline-block; }
+
+  .hero h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(2.8rem, 7vw, 6rem);
+    font-weight: 800;
+    line-height: 1.05;
+    margin-bottom: 1.5rem;
+    background: linear-gradient(135deg, #fff 30%, #C4B5FD);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero-sub {
+    font-size: clamp(1rem, 2vw, 1.2rem);
+    color: var(--muted);
+    max-width: 540px;
+    line-height: 1.7;
+    margin-bottom: 2.5rem;
+  }
+
+  .hero-cta {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    padding: 14px 32px;
+    border-radius: 999px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.2s, transform 0.15s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .btn-primary:hover { background: var(--accent-dark); transform: translateY(-1px); }
+
+  .btn-outline {
+    background: transparent;
+    color: var(--text);
+    border: 1px solid var(--border);
+    padding: 14px 32px;
+    border-radius: 999px;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    text-decoration: none;
+    transition: border-color 0.2s, background 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .btn-outline:hover { border-color: rgba(124,58,237,0.5); background: rgba(124,58,237,0.05); }
+
+  .hero-stats {
+    display: flex;
+    gap: 3rem;
+    margin-top: 4rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .stat { text-align: center; }
+  .stat-num { font-family: 'Syne', sans-serif; font-size: 2rem; font-weight: 800; color: #fff; }
+  .stat-label { font-size: 12px; color: var(--muted); margin-top: 4px; letter-spacing: 0.05em; text-transform: uppercase; }
+
+  .scroll-indicator {
+    position: absolute;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    color: var(--muted);
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    animation: bounce 2s infinite;
+  }
+
+  .scroll-indicator::after {
+    content: '';
+    width: 1px;
+    height: 40px;
+    background: linear-gradient(to bottom, var(--accent), transparent);
+  }
+
+  @keyframes bounce { 0%,100%{transform:translateX(-50%) translateY(0)} 50%{transform:translateX(-50%) translateY(6px)} }
+
+  /* NAV */
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(10,10,15,0.85);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+  }
+
+  .nav-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+  }
+
+  .nav-logo {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: #fff;
+    text-decoration: none;
+  }
+
+  .nav-logo span { color: var(--accent); }
+
+  .nav-links {
+    display: flex;
+    gap: 2rem;
+    list-style: none;
+  }
+
+  .nav-links a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: color 0.2s;
+  }
+
+  .nav-links a:hover { color: #fff; }
+
+  .nav-contact {
+    background: var(--accent);
+    color: #fff;
+    text-decoration: none;
+    padding: 8px 20px;
+    border-radius: 999px;
+    font-size: 14px;
+    font-weight: 600;
+    transition: background 0.2s;
+  }
+
+  .nav-contact:hover { background: var(--accent-dark); }
+
+  /* SECTIONS */
+  section { max-width: 1100px; margin: 0 auto; padding: 5rem 2rem; }
+
+  .section-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--accent);
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+  }
+
+  .section-title {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(1.8rem, 4vw, 3rem);
+    font-weight: 800;
+    color: #fff;
+    line-height: 1.15;
+    margin-bottom: 1rem;
+  }
+
+  .section-desc {
+    color: var(--muted);
+    font-size: 1rem;
+    line-height: 1.7;
+    max-width: 560px;
+    margin-bottom: 3rem;
+  }
+
+  /* CATEGORY TABS */
+  .tabs {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 2.5rem;
+  }
+
+  .tab-btn {
+    padding: 8px 20px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'Inter', sans-serif;
+  }
+
+  .tab-btn:hover { border-color: rgba(124,58,237,0.4); color: #C4B5FD; }
+  .tab-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+  /* CARDS GRID */
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    transition: border-color 0.2s, transform 0.2s;
+    cursor: pointer;
+    display: none;
+  }
+
+  .card.visible { display: block; }
+
+  .card:hover {
+    border-color: rgba(124,58,237,0.35);
+    transform: translateY(-3px);
+  }
+
+  .card-header {
+    padding: 1.5rem 1.5rem 1rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .card-icon {
+    width: 44px; height: 44px;
+    border-radius: 12px;
+    background: rgba(124,58,237,0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+  }
+
+  .card-badge {
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .badge-popular { background: rgba(16,185,129,0.15); color: #34D399; border: 1px solid rgba(16,185,129,0.25); }
+  .badge-destaque { background: rgba(124,58,237,0.15); color: #C4B5FD; border: 1px solid rgba(124,58,237,0.25); }
+  .badge-novo { background: rgba(245,158,11,0.15); color: #FCD34D; border: 1px solid rgba(245,158,11,0.25); }
+
+  .card-body { padding: 1.25rem 1.5rem; }
+
+  .card-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 0.5rem;
+  }
+
+  .card-desc {
+    font-size: 13.5px;
+    color: var(--muted);
+    line-height: 1.65;
+    margin-bottom: 1rem;
+  }
+
+  .card-features {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 1.25rem;
+  }
+
+  .card-features li {
+    font-size: 13px;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .card-features li::before {
+    content: '';
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: var(--accent);
+    flex-shrink: 0;
+  }
+
+  .card-footer {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .price {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .price-from { font-size: 11px; color: var(--muted); }
+  .price-val {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #fff;
+  }
+
+  .price-period { font-size: 12px; color: var(--muted); }
+
+  .btn-card {
+    background: rgba(124,58,237,0.15);
+    color: #C4B5FD;
+    border: 1px solid rgba(124,58,237,0.3);
+    padding: 8px 18px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s;
+    font-family: 'Inter', sans-serif;
+  }
+
+  .btn-card:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+  /* MODAL */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.75);
+    backdrop-filter: blur(6px);
+    z-index: 999;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+  }
+
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: var(--surface);
+    border: 1px solid rgba(124,58,237,0.3);
+    border-radius: 20px;
+    max-width: 680px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+  }
+
+  .modal-header {
+    padding: 2rem 2rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: flex-start;
+    gap: 1.25rem;
+  }
+
+  .modal-icon {
+    width: 56px; height: 56px;
+    border-radius: 14px;
+    background: rgba(124,58,237,0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    flex-shrink: 0;
+  }
+
+  .modal-title-group { flex: 1; }
+
+  .modal-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: #fff;
+    margin-bottom: 4px;
+  }
+
+  .modal-subtitle { font-size: 14px; color: var(--muted); }
+
+  .modal-close {
+    width: 36px; height: 36px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--muted);
+    font-size: 18px;
+    font-family: 'Inter', sans-serif;
+    line-height: 1;
+    flex-shrink: 0;
+    transition: all 0.2s;
+  }
+
+  .modal-close:hover { border-color: rgba(255,255,255,0.2); color: #fff; }
+
+  .modal-body { padding: 1.5rem 2rem; }
+
+  /* INNER TABS */
+  .inner-tabs {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0;
+  }
+
+  .inner-tab {
+    padding: 8px 16px;
+    background: transparent;
+    border: none;
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    transition: all 0.2s;
+  }
+
+  .inner-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .inner-tab:hover:not(.active) { color: #fff; }
+
+  .inner-panel { display: none; }
+  .inner-panel.active { display: block; }
+
+  .detail-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .detail-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  .detail-list li .check {
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: rgba(16,185,129,0.15);
+    border: 1px solid rgba(16,185,129,0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    color: var(--success);
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    position: relative;
+  }
+
+  .timeline-item {
+    display: flex;
+    gap: 1rem;
+    padding-bottom: 1.5rem;
+    position: relative;
+  }
+
+  .timeline-item:last-child { padding-bottom: 0; }
+
+  .timeline-dot {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: rgba(124,58,237,0.15);
+    border: 1px solid rgba(124,58,237,0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    color: #C4B5FD;
+    flex-shrink: 0;
+    z-index: 1;
+  }
+
+  .timeline-content { flex: 1; padding-top: 4px; }
+
+  .timeline-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 4px;
+  }
+
+  .timeline-desc { font-size: 13px; color: var(--muted); line-height: 1.55; }
+
+  .timeline-item:not(:last-child) .timeline-dot::after {
+    content: '';
+    position: absolute;
+    left: 15px;
+    top: 32px;
+    width: 1px;
+    height: calc(100% - 32px + 1.5rem);
+    background: linear-gradient(to bottom, rgba(124,58,237,0.3), transparent);
+  }
+
+  .price-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+
+  .price-table th {
+    text-align: left;
+    padding: 10px 12px;
+    background: var(--surface2);
+    color: var(--muted);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 600;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .price-table td {
+    padding: 12px;
+    border-bottom: 1px solid var(--border);
+    color: #ddd;
+  }
+
+  .price-table tr:last-child td { border-bottom: none; }
+  .price-table .highlight { color: #C4B5FD; font-weight: 600; }
+  .price-table tr:hover td { background: rgba(124,58,237,0.04); }
+
+  .modal-footer {
+    padding: 1.5rem 2rem;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .modal-price {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: #fff;
+  }
+
+  .modal-price small { font-size: 13px; color: var(--muted); font-family: 'Inter', sans-serif; font-weight: 400; }
+
+  .contact-btns {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .btn-wpp {
+    background: #25D366;
+    color: #fff;
+    border: none;
+    padding: 10px 22px;
+    border-radius: 999px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    transition: opacity 0.2s;
+    font-family: 'Inter', sans-serif;
+  }
+
+  .btn-wpp:hover { opacity: 0.85; }
+
+  /* ABOUT */
+  .about-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    align-items: center;
+  }
+
+  @media (max-width: 700px) { .about-grid { grid-template-columns: 1fr; } }
+
+  .about-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 2rem;
+  }
+
+  .skill-bar { margin-bottom: 1rem; }
+  .skill-label { display: flex; justify-content: space-between; font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+  .skill-track { height: 4px; background: var(--surface2); border-radius: 999px; }
+  .skill-fill { height: 4px; border-radius: 999px; background: linear-gradient(to right, var(--accent), #A78BFA); }
+
+  /* CONTACT SECTION */
+  .contact-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 1rem;
+    margin-top: 2rem;
+  }
+
+  .contact-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    text-decoration: none;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+
+  .contact-card:hover { border-color: rgba(124,58,237,0.4); transform: translateY(-2px); }
+
+  .contact-icon {
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+  }
+
+  .contact-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); font-weight: 600; }
+  .contact-value { font-size: 15px; font-weight: 500; color: #fff; }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 3rem 2rem;
+    text-align: center;
+    color: var(--muted);
+    font-size: 13px;
+  }
+
+  footer span { color: var(--accent); }
+
+  /* FLOATING CTA */
+  .floating-wpp {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    background: #25D366;
+    color: #fff;
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    text-decoration: none;
+    z-index: 200;
+    box-shadow: 0 4px 24px rgba(37,211,102,0.35);
+    transition: transform 0.2s;
+  }
+
+  .floating-wpp:hover { transform: scale(1.1); }
+
+  /* Utility */
+  .text-accent { color: #C4B5FD; }
+  .hidden { display: none !important; }
+
+  @media (max-width: 600px) {
+    .nav-links { display: none; }
+    .cards-grid { grid-template-columns: 1fr; }
+    .modal-body { padding: 1rem 1.25rem; }
+    .modal-header { padding: 1.5rem 1.25rem 1rem; }
+    .modal-footer { padding: 1rem 1.25rem; flex-direction: column; align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <a href="#" class="nav-logo">sousa.<span>devstack</span></a>
+    <ul class="nav-links">
+      <li><a href="#servicos">Serviços</a></li>
+      <li><a href="#sobre">Sobre</a></li>
+      <li><a href="#contato">Contato</a></li>
+    </ul>
+    <a class="nav-contact" href="https://wa.me/5581993277428" target="_blank">Solicitar orçamento</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-badge">
+    <span></span> Disponível para novos projetos
+  </div>
+  <h1>Sites que vendem.<br>Catálogos que convencem.</h1>
+  <p class="hero-sub">
+    Sou Paulo César, desenvolvedor full-stack especializado em criar presença digital de alto impacto — sites, portfólios e catálogos que transformam visitantes em clientes.
+  </p>
+  <div class="hero-cta">
+    <a class="btn-primary" href="#servicos">Ver serviços ↓</a>
+    <a class="btn-outline" href="https://wa.me/5581993277428" target="_blank">💬 Falar no WhatsApp</a>
+  </div>
+  <div class="hero-stats">
+    <div class="stat"><div class="stat-num">50+</div><div class="stat-label">Projetos entregues</div></div>
+    <div class="stat"><div class="stat-num">3 dias</div><div class="stat-label">Entrega rápida</div></div>
+    <div class="stat"><div class="stat-num">100%</div><div class="stat-label">Satisfação garantida</div></div>
+  </div>
+  <div class="scroll-indicator">scroll</div>
+</div>
+
+<!-- CATÁLOGO DE SERVIÇOS -->
+<section id="servicos">
+  <div class="section-label">Catálogo completo</div>
+  <h2 class="section-title">Escolha o serviço ideal<br>para você</h2>
+  <p class="section-desc">Todos os projetos incluem design responsivo, otimização de velocidade e suporte pós-entrega. Clique em qualquer card para ver detalhes completos.</p>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-filter="todos">Todos</button>
+    <button class="tab-btn" data-filter="landing">Landing Pages</button>
+    <button class="tab-btn" data-filter="portfolio">Portfólios</button>
+    <button class="tab-btn" data-filter="catalogo">Catálogos</button>
+    <button class="tab-btn" data-filter="institucional">Institucionais</button>
+  </div>
+
+  <div class="cards-grid" id="cardsGrid">
+
+    <!-- CARD 1 -->
+    <div class="card visible" data-category="landing" data-id="0">
+      <div class="card-header">
+        <div class="card-icon">🚀</div>
+        <span class="card-badge badge-popular">🔥 Popular</span>
+      </div>
+      <div class="card-body">
+        <div class="card-title">Landing Page Essencial</div>
+        <p class="card-desc">Página de conversão focada em capturar leads e apresentar seu produto ou serviço com clareza e impacto.</p>
+        <ul class="card-features">
+          <li>Design moderno e responsivo</li>
+          <li>1 seção de formulário/CTA</li>
+          <li>Integração com WhatsApp</li>
+          <li>Entrega em até 3 dias</li>
+        </ul>
+      </div>
+      <div class="card-footer">
+        <div class="price">
+          <span class="price-from">A partir de</span>
+          <span class="price-val">R$ 150</span>
+        </div>
+        <button class="btn-card" onclick="openModal(0)">Ver detalhes</button>
+      </div>
+    </div>
+
+    <!-- CARD 2 -->
+    <div class="card visible" data-category="landing" data-id="1">
+      <div class="card-header">
+        <div class="card-icon">⚡</div>
+        <span class="card-badge badge-destaque">✨ Destaque</span>
+      </div>
+      <div class="card-body">
+        <div class="card-title">Landing Page Premium</div>
+        <p class="card-desc">Landing page completa com animações, múltiplas seções e integração com ferramentas de marketing digital.</p>
+        <ul class="card-features">
+          <li>Animações e micro-interações</li>
+          <li>Múltiplas seções (hero, benefícios, depoimentos)</li>
+          <li>SEO básico configurado</li>
+          <li>Formulário com envio de e-mail</li>
+        </ul>
+      </div>
+      <div class="card-footer">
+        <div class="price">
+          <span class="price-from">A partir de</span>
+          <span class="price-val">R$ 280</span>
+        </div>
+        <button class="btn-card" onclick="openModal(1)">Ver detalhes</button>
+      </div>
+    </div>
+
+    <!-- CARD 3 -->
+    <div class="card visible" data-category="portfolio" data-id="2">
+      <div class="card-header">
+        <div class="card-icon">🎨</div>
+        <span class="card-badge badge-novo">Novo</span>
+      </div>
+      <div class="card-body">
+        <div class="card-title">Portfólio Profissional</div>
+        <p class="card-desc">Site portfólio para freelancers, designers, fotógrafos e profissionais criativos mostrarem seus trabalhos com elegância.</p>
+        <ul class="card-features">
+          <li>Galeria de projetos interativa</li>
+          <li>Página "Sobre mim" personalizada</li>
+          <li>Seção de habilidades animada</li>
+          <li>Formulário de contato integrado</li>
+        </ul>
+      </div>
+      <div class="card-footer">
+        <div class="price">
+          <span class="price-from">A partir de</span>
+          <span class="price-val">R$ 220</span>
+        </div>
+        <button class="btn-card" onclick="openModal(2)">Ver detalhes</button>
+      </div>
+    </div>
+
+    <!-- CARD 4 -->
+    <div class="card visible" data-category="portfolio" data-id="3">
+      <div class="card-header">
+        <div class="card-icon">💼</div>
+        <span class="card-badge badge-popular">🔥 Popular</span>
+      </div>
+      <div class="card-body">
+        <div class="card-title">Portfólio Empresarial</div>
+        <p class="card-desc">Portfólio robusto para empresas e agências que querem exibir cases, equipe e diferenciais de forma profissional.</p>
+        <ul class="card-features">
+          <li>Página de cases com filtros</li>
+          <li>Sessão de equipe/time</li>
+          <li>Blog integrado (opcional)</li>
+          <li>Mapa de localização</li>
+        </ul>
+      </div>
+      <div class="card-footer">
+        <div class="price">
+          <span class="price-from">A partir de</span>
+          <span class="price-val">R$ 380</span>
+        </div>
+        <button class="btn-card" onclick="openModal(3)">Ver detalhes</button>
+      </div>
+    </div>
+
+    <!-- CARD 5 -->
+    <div class="card visible" data-category="catalogo" data-id="4">
+      <div class="card-header">
+        <div class="card-icon">📋</div>
+        <span class="card-badge badge-destaque">✨ Destaque</span>
+      </div>
+      <div class="card-body">
+        <div class="card-title">Catálogo Digital Simples</div>
+        <p class="card-desc">Catálogo online com listagem de produtos/serviços, filtros por categoria e botão de contato integrado.</p>
+        <ul class="card-features">
+          <li>Até 20 produtos/serviços</li>
+          <li>Filtros por categoria</li>
+          <li>Botão "Pedir via WhatsApp"</li>
+          <li>Design limpo e navegável</li>
+        </ul>
+      </div>
+      <div class="card-footer">
+        <div class="price">
+          <span class="price-from">A partir de</span>
+          <span class="price-val">R$ 200</span>
+        </div>
+        <button class="btn-card" onclick="openModal(4)">Ver detalhes</button>
+      </div>
+    </div>
+
+    <!-- CARD 6 -->
+    <div class="card visible" data-category="catalogo" data-id="5">
+      <div class="card-header">
+        <div class="card-icon">🛍️</div>
+        <span class="card-badge badge-novo">Novo</span>
+      </div>
+      <div class="card-body">
+        <div class="card-title">Catálogo Digital Completo</div>
+        <p class="card-desc">Catálogo avançado com páginas de produto individuais, busca, favoritos e layout sofisticado para marcas premium.</p>
+        <ul class="card-features">
+          <li>Produtos ilimitados</li>
+          <li>Busca em tempo real</li>
+          <li>Página individual por produto</li>
+          <li>Galeria de imagens por item</li>
+        </ul>
+      </div>
+      <div class="card-footer">
+        <div class="price">
+          <span class="price-from">A partir de</span>
+          <span class="price-val">R$ 420</span>
+        </div>
+        <button class="btn-card" onclick="openModal(5)">Ver detalhes</button>
+      </div>
+    </div>
+
+    <!-- CARD 7 -->
+    <div class="card visible" data-category="institucional" data-id="6">
+      <div class="card-header">
+        <div class="card-icon">🏢</div>
+        <span class="card-badge badge-popular">🔥 Popular</span>
+      </div>
+      <div class="card-body">
+        <div class="card-title">Site Institucional Básico</div>
+        <p class="card-desc">Site completo para pequenas e médias empresas — apresentação, serviços, equipe e contato em um layout elegante.</p>
+        <ul class="card-features">
+          <li>5 páginas completas</li>
+          <li>Design responsivo</li>
+          <li>Formulário de contato</li>
+          <li>Google Maps integrado</li>
+        </ul>
+      </div>
+      <div class="card-footer">
+        <div class="price">
+          <span class="price-from">A partir de</span>
+          <span class="price-val">R$ 300</span>
+        </div>
+        <button class="btn-card" onclick="openModal(6)">Ver detalhes</button>
+      </div>
+    </div>
+
+    <!-- CARD 8 -->
+    <div class="card visible" data-category="institucional" data-id="7">
+      <div class="card-header">
+        <div class="card-icon">🌐</div>
+        <span class="card-badge badge-destaque">✨ Destaque</span>
+      </div>
+      <div class="card-body">
+        <div class="card-title">Site Institucional Premium</div>
+        <p class="card-desc">Site robusto com identidade visual personalizada, animações, blog e integração com redes sociais para médias e grandes empresas.</p>
+        <ul class="card-features">
+          <li>Design exclusivo</li>
+          <li>Blog com CMS simples</li>
+          <li>Animações de scroll</li>
+          <li>SEO avançado</li>
+        </ul>
+      </div>
+      <div class="card-footer">
+        <div class="price">
+          <span class="price-from">A partir de</span>
+          <span class="price-val">R$ 500</span>
+        </div>
+        <button class="btn-card" onclick="openModal(7)">Ver detalhes</button>
+      </div>
+    </div>
+
+    <!-- CARD 9 -->
+    <div class="card visible" data-category="landing" data-id="8">
+      <div class="card-header">
+        <div class="card-icon">📱</div>
+        <span class="card-badge badge-novo">Novo</span>
+      </div>
+      <div class="card-body">
+        <div class="card-title">Link na Bio (Linktree)</div>
+        <p class="card-desc">Página de links personalizada para o Instagram — muito mais bonita e profissional que o Linktree padrão, com sua identidade visual.</p>
+        <ul class="card-features">
+          <li>Layout 100% personalizado</li>
+          <li>Links ilimitados</li>
+          <li>Foto de perfil e bio</li>
+          <li>Entrega em até 1 dia</li>
+        </ul>
+      </div>
+      <div class="card-footer">
+        <div class="price">
+          <span class="price-from">A partir de</span>
+          <span class="price-val">R$ 30</span>
+        </div>
+        <button class="btn-card" onclick="openModal(8)">Ver detalhes</button>
+      </div>
+    </div>
+
+    <!-- CARD 10 -->
+    <div class="card visible" data-category="portfolio" data-id="9">
+      <div class="card-header">
+        <div class="card-icon">📸</div>
+        <span class="card-badge badge-destaque">✨ Destaque</span>
+      </div>
+      <div class="card-body">
+        <div class="card-title">Portfólio para Fotógrafos</div>
+        <p class="card-desc">Site galeria especialmente desenvolvido para fotógrafos — layout editorial com foco total nas imagens, lightbox e lazy load.</p>
+        <ul class="card-features">
+          <li>Layout tipo editorial</li>
+          <li>Lightbox para visualização</li>
+          <li>Carregamento otimizado</li>
+          <li>Álbuns por categoria</li>
+        </ul>
+      </div>
+      <div class="card-footer">
+        <div class="price">
+          <span class="price-from">A partir de</span>
+          <span class="price-val">R$ 260</span>
+        </div>
+        <button class="btn-card" onclick="openModal(9)">Ver detalhes</button>
+      </div>
+    </div>
+
+    <!-- CARD 11 -->
+    <div class="card visible" data-category="catalogo" data-id="10">
+      <div class="card-header">
+        <div class="card-icon">🍽️</div>
+        <span class="card-badge badge-popular">🔥 Popular</span>
+      </div>
+      <div class="card-body">
+        <div class="card-title">Cardápio Digital</div>
+        <p class="card-desc">Cardápio online para restaurantes, lanchonetes e deliveries — com fotos, descrições, preços e pedido via WhatsApp.</p>
+        <ul class="card-features">
+          <li>Categorias de pratos</li>
+          <li>Fotos e descrições</li>
+          <li>Botão de pedido WhatsApp</li>
+          <li>Horário de funcionamento</li>
+        </ul>
+      </div>
+      <div class="card-footer">
+        <div class="price">
+          <span class="price-from">A partir de</span>
+          <span class="price-val">R$ 180</span>
+        </div>
+        <button class="btn-card" onclick="openModal(10)">Ver detalhes</button>
+      </div>
+    </div>
+
+    <!-- CARD 12 -->
+    <div class="card visible" data-category="institucional" data-id="11">
+      <div class="card-header">
+        <div class="card-icon">🎓</div>
+        <span class="card-badge badge-novo">Novo</span>
+      </div>
+      <div class="card-body">
+        <div class="card-title">Site para Profissional Liberal</div>
+        <p class="card-desc">Site personalizado para médicos, advogados, psicólogos, dentistas e outros profissionais que precisam transmitir credibilidade.</p>
+        <ul class="card-features">
+          <li>Design sóbrio e profissional</li>
+          <li>Agendamento online (link)</li>
+          <li>Depoimentos de clientes</li>
+          <li>Área de especialidades</li>
+        </ul>
+      </div>
+      <div class="card-footer">
+        <div class="price">
+          <span class="price-from">A partir de</span>
+          <span class="price-val">R$ 350</span>
+        </div>
+        <button class="btn-card" onclick="openModal(11)">Ver detalhes</button>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- SOBRE -->
+<section id="sobre" style="border-top: 1px solid rgba(255,255,255,0.05);">
+  <div class="section-label">Quem faz</div>
+  <h2 class="section-title">Paulo César Sousa</h2>
+  <p class="section-desc">Desenvolvedor web com foco em experiências visuais que convertem. Trabalho do briefing ao deploy, entregando sites que funcionam e impressionam.</p>
+
+  <div class="about-grid">
+    <div>
+      <p style="color: var(--muted); font-size: 15px; line-height: 1.8; margin-bottom: 1.5rem;">
+        Fundador da <strong style="color: #fff">DevStack</strong>, atuo há mais de 3 anos criando presença digital para freelancers, pequenas empresas e profissionais liberais em todo o Brasil.
+      </p>
+      <p style="color: var(--muted); font-size: 15px; line-height: 1.8; margin-bottom: 2rem;">
+        Cada projeto é construído do zero, com atenção aos detalhes de design, performance e usabilidade. Nada de templates prontos — seu site será único.
+      </p>
+      <a href="https://wa.me/5581993277428" class="btn-primary" target="_blank" style="display:inline-flex;">
+        Conversar comigo 💬
+      </a>
+    </div>
+    <div class="about-card">
+      <div class="skill-bar">
+        <div class="skill-label"><span>HTML / CSS / JavaScript</span><span>98%</span></div>
+        <div class="skill-track"><div class="skill-fill" style="width:98%"></div></div>
+      </div>
+      <div class="skill-bar">
+        <div class="skill-label"><span>UI/UX Design</span><span>90%</span></div>
+        <div class="skill-track"><div class="skill-fill" style="width:90%"></div></div>
+      </div>
+      <div class="skill-bar">
+        <div class="skill-label"><span>React / Next.js</span><span>85%</span></div>
+        <div class="skill-track"><div class="skill-fill" style="width:85%"></div></div>
+      </div>
+      <div class="skill-bar">
+        <div class="skill-label"><span>SEO & Performance</span><span>80%</span></div>
+        <div class="skill-track"><div class="skill-fill" style="width:80%"></div></div>
+      </div>
+      <div class="skill-bar">
+        <div class="skill-label"><span>Integrações & APIs</span><span>75%</span></div>
+        <div class="skill-track"><div class="skill-fill" style="width:75%"></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTATO -->
+<section id="contato" style="border-top: 1px solid rgba(255,255,255,0.05);">
+  <div class="section-label">Entre em contato</div>
+  <h2 class="section-title">Vamos criar algo<br>incrível juntos</h2>
+  <p class="section-desc">Escolha o canal de sua preferência. Respondo em menos de 2 horas nos horários comerciais.</p>
+  <div class="contact-grid">
+    <a class="contact-card" href="https://wa.me/5581993277428" target="_blank">
+      <div class="contact-icon" style="background: rgba(37,211,102,0.15);">💬</div>
+      <span class="contact-label">WhatsApp</span>
+      <span class="contact-value">(81) 99327-7429</span>
+    </a>
+    <a class="contact-card" href="https://instagram.com/sousa.devstack" target="_blank">
+      <div class="contact-icon" style="background: rgba(124,58,237,0.15);">📸</div>
+      <span class="contact-label">Instagram</span>
+      <span class="contact-value">@sousa.devstack</span>
+    </a>
+    <a class="contact-card" href="mailto:pcssousa772@gmail.com" target="_blank">
+      <div class="contact-icon" style="background: rgba(234,88,12,0.15);">✉️</div>
+      <span class="contact-label">E-mail</span>
+      <span class="contact-value">pcssousa772@gmail.com</span>
+    </a>
+  </div>
+</section>
+
+<footer>
+  <p>© 2025 <span>sousa.devstack</span> — Todos os direitos reservados.</p>
+  <p style="margin-top: 8px; font-size: 12px;">Sites que vendem. Catálogos que convencem. Resultados que aparecem.</p>
+</footer>
+
+<!-- FLOATING WPP -->
+<a class="floating-wpp" href="https://wa.me/5581993277428" target="_blank" title="Chamar no WhatsApp">💬</a>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModalOutside(event)">
+  <div class="modal" id="modal">
+    <div class="modal-header">
+      <div class="modal-icon" id="mIcon"></div>
+      <div class="modal-title-group">
+        <div class="modal-title" id="mTitle"></div>
+        <div class="modal-subtitle" id="mSub"></div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="inner-tabs">
+        <button class="inner-tab active" data-panel="visao">Visão Geral</button>
+        <button class="inner-tab" data-panel="incluso">O que inclui</button>
+        <button class="inner-tab" data-panel="processo">Processo</button>
+        <button class="inner-tab" data-panel="valores">Valores</button>
+      </div>
+      <div class="inner-panel active" id="panel-visao"></div>
+      <div class="inner-panel" id="panel-incluso"></div>
+      <div class="inner-panel" id="panel-processo"></div>
+      <div class="inner-panel" id="panel-valores"></div>
+    </div>
+    <div class="modal-footer">
+      <div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:4px">Preço a partir de</div>
+        <div class="modal-price" id="mPrice"></div>
+      </div>
+      <div class="contact-btns">
+        <a class="btn-wpp" id="mWpp" href="#" target="_blank">💬 Pedir via WhatsApp</a>
+        <a class="btn-outline" href="mailto:pcssousa772@gmail.com">✉️ E-mail</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const services = [
+  {
+    icon: '🚀', title: 'Landing Page Essencial', sub: 'Conversão rápida e direta', price: 'R$ 150',
+    desc: 'Ideal para quem quer começar a ter presença online ou lançar um produto/serviço com uma página objetiva que converte visitantes em clientes.',
+    incluso: ['Design moderno e responsivo (mobile e desktop)', 'Seção hero com chamada para ação', 'Integração direta com WhatsApp', '1 formulário de captura de leads', 'Ícones e ilustrações personalizadas', 'Hospedagem configurada (domínio do cliente)', 'Entrega do código-fonte completo'],
+    processo: [
+      { t: 'Briefing', d: 'Você responde um formulário rápido com referências, cores e objetivo da página.' },
+      { t: 'Protótipo', d: 'Em até 24h entrego um rascunho visual para você aprovar.' },
+      { t: 'Desenvolvimento', d: 'Construção completa da página com código limpo e responsivo.' },
+      { t: 'Entrega', d: 'Página publicada no ar com domínio ou subdomínio, tudo configurado.' }
+    ],
+    tabela: [
+      { item: 'Landing Page Essencial', prazo: '3 dias', revisoes: '2 revisões', preco: 'R$ 150' },
+      { item: '+ Animações de entrada', prazo: '+1 dia', revisoes: '—', preco: 'R$ 50' },
+      { item: '+ Formulário com e-mail', prazo: '+1 dia', revisoes: '—', preco: 'R$ 40' }
+    ]
+  },
+  {
+    icon: '⚡', title: 'Landing Page Premium', sub: 'Alta conversão com design sofisticado', price: 'R$ 280',
+    desc: 'Landing page profissional com múltiplas seções, animações de scroll e integração com ferramentas de marketing para maximizar conversões.',
+    incluso: ['Todas as seções: hero, benefícios, depoimentos, FAQ, CTA', 'Animações de scroll suaves', 'SEO básico configurado (meta tags, OG)', 'Formulário com envio automático de e-mail', 'Google Analytics integrado', 'Contador regressivo / urgência (opcional)', 'Velocidade otimizada (score 90+ no PageSpeed)'],
+    processo: [
+      { t: 'Briefing detalhado', d: 'Chamada de 30 min ou formulário estendido com análise de concorrentes.' },
+      { t: 'Wireframe', d: 'Estrutura visual de todas as seções para aprovação.' },
+      { t: 'Design e código', d: 'Desenvolvimento completo com animações e responsividade.' },
+      { t: 'Testes e ajustes', d: 'Testes em múltiplos dispositivos e browsers antes da entrega.' },
+      { t: 'Deploy', d: 'Página publicada e configurada com domínio do cliente.' }
+    ],
+    tabela: [
+      { item: 'Landing Page Premium', prazo: '5 dias', revisoes: '3 revisões', preco: 'R$ 280' },
+      { item: '+ Pop-up de saída', prazo: '+1 dia', revisoes: '—', preco: 'R$ 60' },
+      { item: '+ Chat ao vivo integrado', prazo: '+1 dia', revisoes: '—', preco: 'R$ 50' }
+    ]
+  },
+  {
+    icon: '🎨', title: 'Portfólio Profissional', sub: 'Sua vitrine digital', price: 'R$ 220',
+    desc: 'Portfólio elegante para profissionais criativos mostrarem seus melhores trabalhos e atrairem os clientes certos.',
+    incluso: ['Página inicial com apresentação impactante', 'Galeria de projetos com filtro por tipo', 'Página "Sobre mim" personalizada', 'Seção de habilidades com barra de progresso', 'Formulário de contato funcional', 'Links para redes sociais', 'Dark/Light mode (opcional)'],
+    processo: [
+      { t: 'Coleta de materiais', d: 'Você envia fotos, projetos, bio e referências de design.' },
+      { t: 'Layout', d: 'Criação do layout personalizado à sua identidade visual.' },
+      { t: 'Desenvolvimento', d: 'Código responsivo com galeria interativa e animações.' },
+      { t: 'Publicação', d: 'Site no ar e configurado, pronto para compartilhar.' }
+    ],
+    tabela: [
+      { item: 'Portfólio Profissional', prazo: '4 dias', revisoes: '2 revisões', preco: 'R$ 220' },
+      { item: '+ Modo escuro/claro', prazo: '+1 dia', revisoes: '—', preco: 'R$ 50' },
+      { item: '+ Blog pessoal', prazo: '+2 dias', revisoes: '—', preco: 'R$ 80' }
+    ]
+  },
+  {
+    icon: '💼', title: 'Portfólio Empresarial', sub: 'Cases e credibilidade para agências', price: 'R$ 380',
+    desc: 'Portfólio robusto para agências e empresas que querem exibir projetos, apresentar o time e conquistar clientes corporativos.',
+    incluso: ['Página de cases com filtros e busca', 'Página de team/equipe com fotos', 'Seção de parceiros e logos de clientes', 'Depoimentos em carrossel', 'Blog corporativo integrado (opcional)', 'Página de contato com formulário avançado', 'Google Maps e dados da empresa'],
+    processo: [
+      { t: 'Análise', d: 'Entendimento do mercado-alvo e posicionamento da empresa.' },
+      { t: 'Identidade visual', d: 'Alinhamento do site à marca existente ou criação de nova paleta.' },
+      { t: 'Desenvolvimento', d: 'Construção completa com todas as páginas e funcionalidades.' },
+      { t: 'Revisão', d: 'Rodada de ajustes com até 3 revisões incluídas.' },
+      { t: 'Deploy', d: 'Publicação com todas as configurações de SEO e performance.' }
+    ],
+    tabela: [
+      { item: 'Portfólio Empresarial', prazo: '7 dias', revisoes: '3 revisões', preco: 'R$ 380' },
+      { item: '+ Painel de edição simples', prazo: '+2 dias', revisoes: '—', preco: 'R$ 120' },
+      { item: '+ Animações avançadas', prazo: '+2 dias', revisoes: '—', preco: 'R$ 80' }
+    ]
+  },
+  {
+    icon: '📋', title: 'Catálogo Digital Simples', sub: 'Produtos com filtro e contato', price: 'R$ 200',
+    desc: 'Catálogo online elegante para lojas, prestadores de serviço e profissionais que querem mostrar o que oferecem com organização e estilo.',
+    incluso: ['Até 20 produtos/serviços cadastrados', 'Filtro por categorias', 'Foto, nome, descrição e preço por item', 'Botão "Pedir via WhatsApp" em cada item', 'Página de contato', 'Layout responsivo e rápido', 'Fácil de atualizar (instruções incluídas)'],
+    processo: [
+      { t: 'Coleta dos produtos', d: 'Você envia fotos, nomes, descrições e preços de cada item.' },
+      { t: 'Estrutura', d: 'Organização das categorias e layout do catálogo.' },
+      { t: 'Desenvolvimento', d: 'Catálogo funcional com filtros e integração com WhatsApp.' },
+      { t: 'Entrega', d: 'Catálogo publicado com link único para compartilhar.' }
+    ],
+    tabela: [
+      { item: 'Catálogo Digital Simples', prazo: '3 dias', revisoes: '2 revisões', preco: 'R$ 200' },
+      { item: '+ Produtos adicionais (por 10)', prazo: '+1 dia', revisoes: '—', preco: 'R$ 50' },
+      { item: '+ Campo de busca', prazo: '+1 dia', revisoes: '—', preco: 'R$ 40' }
+    ]
+  },
+  {
+    icon: '🛍️', title: 'Catálogo Digital Completo', sub: 'Navegação premium por produtos', price: 'R$ 420',
+    desc: 'Catálogo avançado com páginas individuais por produto, sistema de busca, galeria de imagens e experiência de navegação de alto nível.',
+    incluso: ['Produtos ilimitados', 'Busca em tempo real', 'Página individual por produto', 'Galeria de até 5 imagens por item', 'Tabela de variações (tamanho, cor, etc.)', 'Compartilhamento direto por produto', 'Analytics de itens mais vistos (opcional)'],
+    processo: [
+      { t: 'Inventário', d: 'Organização de todos os produtos com fotos e descrições completas.' },
+      { t: 'Arquitetura', d: 'Estrutura de navegação e categorias pensada para conversão.' },
+      { t: 'Desenvolvimento', d: 'Catálogo completo com busca, filtros e páginas de produto.' },
+      { t: 'Revisão e testes', d: 'Testes de usabilidade e ajustes visuais.' },
+      { t: 'Deploy', d: 'Publicação e entrega com documentação de como adicionar produtos.' }
+    ],
+    tabela: [
+      { item: 'Catálogo Completo', prazo: '7 dias', revisoes: '3 revisões', preco: 'R$ 420' },
+      { item: '+ Carrinho de orçamento', prazo: '+2 dias', revisoes: '—', preco: 'R$ 100' },
+      { item: '+ Painel de administração', prazo: '+3 dias', revisoes: '—', preco: 'R$ 150' }
+    ]
+  },
+  {
+    icon: '🏢', title: 'Site Institucional Básico', sub: '5 páginas que transmitem credibilidade', price: 'R$ 300',
+    desc: 'Site completo para pequenas e médias empresas com todas as informações necessárias para transmitir profissionalismo e conquistar novos clientes.',
+    incluso: ['Páginas: Home, Sobre, Serviços, Equipe, Contato', 'Design responsivo e moderno', 'Formulário de contato funcional', 'Google Maps integrado', 'Redes sociais linkadas', 'Favicon e meta tags configurados', 'Certificado SSL incluso (https)'],
+    processo: [
+      { t: 'Briefing', d: 'Formulário sobre a empresa, valores, público e referências.' },
+      { t: 'Wireframe', d: 'Estrutura de todas as páginas para aprovação antes do design.' },
+      { t: 'Design', d: 'Layout visual alinhado à identidade da empresa.' },
+      { t: 'Desenvolvimento', d: 'Todas as páginas codadas com responsividade completa.' },
+      { t: 'Publicação', d: 'Site publicado com configurações de segurança e performance.' }
+    ],
+    tabela: [
+      { item: 'Institucional Básico', prazo: '5 dias', revisoes: '2 revisões', preco: 'R$ 300' },
+      { item: '+ Página extra', prazo: '+1 dia', revisoes: '—', preco: 'R$ 80' },
+      { item: '+ Pop-up de cookies/LGPD', prazo: '+1 dia', revisoes: '—', preco: 'R$ 40' }
+    ]
+  },
+  {
+    icon: '🌐', title: 'Site Institucional Premium', sub: 'Identidade digital completa', price: 'R$ 500',
+    desc: 'Site sofisticado com design exclusivo, animações de alta qualidade, blog e estratégia de SEO para empresas que querem se destacar.',
+    incluso: ['Design exclusivo (não é template)', 'Animações de scroll e micro-interações', 'Blog com CMS simples para editar sem programar', 'SEO avançado (estrutura, velocidade, meta dados)', 'Integração com redes sociais', 'Chat/suporte integrado', 'Google Analytics e Tag Manager configurados'],
+    processo: [
+      { t: 'Discovery', d: 'Reunião aprofundada sobre objetivos, mercado e posicionamento.' },
+      { t: 'Identidade visual', d: 'Paleta, tipografia e elementos gráficos exclusivos.' },
+      { t: 'Protótipo no Figma', d: 'Mockup interativo para aprovação antes de codar.' },
+      { t: 'Desenvolvimento', d: 'Código de qualidade com atenção a performance e acessibilidade.' },
+      { t: 'QA e publicação', d: 'Testes completos e publicação com treinamento de uso do blog.' }
+    ],
+    tabela: [
+      { item: 'Institucional Premium', prazo: '10 dias', revisoes: '4 revisões', preco: 'R$ 500' },
+      { item: '+ Manutenção mensal', prazo: 'Mensal', revisoes: 'Ilimitado', preco: 'R$ 100/mês' },
+      { item: '+ E-mail profissional config.', prazo: '+1 dia', revisoes: '—', preco: 'R$ 60' }
+    ]
+  },
+  {
+    icon: '📱', title: 'Link na Bio (Linktree)', sub: 'Bio page personalizada para o Instagram', price: 'R$ 30',
+    desc: 'Substitua o Linktree genérico por uma página de links com sua cara — personalizada, bonita e alinhada à sua identidade visual.',
+    incluso: ['Layout 100% personalizado', 'Links ilimitados', 'Foto de perfil e bio', 'Ícones das redes sociais', 'Cores e fontes da sua marca', 'Entrega em até 24h', 'Código-fonte entregue'],
+    processo: [
+      { t: 'Briefing', d: 'Você envia foto, links, cores e referências.' },
+      { t: 'Design', d: 'Criação do layout personalizado.' },
+      { t: 'Código', d: 'Página HTML pronta para publicar.' },
+      { t: 'Entrega', d: 'Arquivo e link online em até 24h.' }
+    ],
+    tabela: [
+      { item: 'Link na Bio', prazo: '1 dia', revisoes: '1 revisão', preco: 'R$ 30' },
+      { item: '+ Animações', prazo: '+1 dia', revisoes: '—', preco: 'R$ 20' },
+      { item: '+ Domínio configurado', prazo: '+1 dia', revisoes: '—', preco: 'R$ 30' }
+    ]
+  },
+  {
+    icon: '📸', title: 'Portfólio para Fotógrafos', sub: 'Galeria editorial de alto impacto', price: 'R$ 260',
+    desc: 'Site galeria desenvolvido especialmente para fotógrafos — as imagens são as protagonistas, com layout editorial e carregamento rápido.',
+    incluso: ['Layout editorial com foco nas fotos', 'Lightbox para visualização em tela cheia', 'Carregamento otimizado (lazy load)', 'Álbuns organizados por categoria', 'Página de contato / orçamento', 'Marca d\'água opcional nas imagens', 'Velocidade otimizada para galerias grandes'],
+    processo: [
+      { t: 'Seleção de fotos', d: 'Você envia as imagens organizadas por álbum.' },
+      { t: 'Layout', d: 'Criação do design com foco na fotografia.' },
+      { t: 'Galeria interativa', d: 'Desenvolvimento com lightbox e lazy loading.' },
+      { t: 'Publicação', d: 'Site no ar com todas as imagens otimizadas.' }
+    ],
+    tabela: [
+      { item: 'Portfólio para Fotógrafos', prazo: '4 dias', revisoes: '2 revisões', preco: 'R$ 260' },
+      { item: '+ Proteção anti-download', prazo: '+1 dia', revisoes: '—', preco: 'R$ 50' },
+      { item: '+ Formulário de orçamento', prazo: '+1 dia', revisoes: '—', preco: 'R$ 40' }
+    ]
+  },
+  {
+    icon: '🍽️', title: 'Cardápio Digital', sub: 'Para restaurantes e deliveries', price: 'R$ 180',
+    desc: 'Cardápio online profissional para substituir o PDF ou impresso — com fotos, categorias, preços e pedido direto pelo WhatsApp.',
+    incluso: ['Categorias de pratos (entradas, pratos, bebidas...)', 'Foto, nome, descrição e preço por item', 'Botão "Pedir via WhatsApp"', 'Horário de funcionamento', 'Endereço e mapa do estabelecimento', 'Layout adaptado para celular', 'Fácil de atualizar'],
+    processo: [
+      { t: 'Coleta do cardápio', d: 'Fotos, nomes, descrições e preços de todos os itens.' },
+      { t: 'Design', d: 'Layout alinhado à identidade visual do restaurante.' },
+      { t: 'Desenvolvimento', d: 'Cardápio funcional com categorias e WhatsApp.' },
+      { t: 'Entrega', d: 'Link único para compartilhar no Instagram, Google Maps e etc.' }
+    ],
+    tabela: [
+      { item: 'Cardápio Digital', prazo: '3 dias', revisoes: '2 revisões', preco: 'R$ 180' },
+      { item: '+ Itens adicionais (por 10)', prazo: '+1 dia', revisoes: '—', preco: 'R$ 40' },
+      { item: '+ Seção de promoções', prazo: '+1 dia', revisoes: '—', preco: 'R$ 50' }
+    ]
+  },
+  {
+    icon: '🎓', title: 'Site para Profissional Liberal', sub: 'Credibilidade e agendamento', price: 'R$ 350',
+    desc: 'Site personalizado para médicos, advogados, psicólogos, dentistas e outros profissionais — transmite confiança e facilita o contato dos pacientes/clientes.',
+    incluso: ['Design sóbrio e profissional', 'Áreas de atuação / especialidades', 'Depoimentos de clientes/pacientes', 'Link para agendamento (Calendly, WhatsApp)', 'Formação e certificações', 'Foto profissional em destaque', 'Política de privacidade e LGPD'],
+    processo: [
+      { t: 'Briefing', d: 'Formulário sobre especialidades, público e imagem desejada.' },
+      { t: 'Layout', d: 'Design sóbrio e confiável, alinhado à área de atuação.' },
+      { t: 'Desenvolvimento', d: 'Todas as seções codadas com responsividade e velocidade.' },
+      { t: 'Publicação', d: 'Site no ar com configurações de SEO local (cidade + especialidade).' }
+    ],
+    tabela: [
+      { item: 'Profissional Liberal', prazo: '5 dias', revisoes: '2 revisões', preco: 'R$ 350' },
+      { item: '+ Chatbot de triagem', prazo: '+2 dias', revisoes: '—', preco: 'R$ 100' },
+      { item: '+ Blog de artigos', prazo: '+2 dias', revisoes: '—', preco: 'R$ 80' }
+    ]
+  }
+];
+
+function openModal(id) {
+  const s = services[id];
+  document.getElementById('mIcon').textContent = s.icon;
+  document.getElementById('mTitle').textContent = s.title;
+  document.getElementById('mSub').textContent = s.sub;
+  document.getElementById('mPrice').textContent = s.price;
+  const msg = encodeURIComponent('Olá! Tenho interesse no serviço: ' + s.title + '. Podemos conversar?');
+  document.getElementById('mWpp').href = 'https://wa.me/5581993277428?text=' + msg;
+
+  document.getElementById('panel-visao').innerHTML = `<p style="color:var(--muted);font-size:14px;line-height:1.75;">${s.desc}</p>`;
+
+  let inclusoHtml = '<ul class="detail-list">';
+  s.incluso.forEach(i => { inclusoHtml += `<li><span class="check">✓</span>${i}</li>`; });
+  inclusoHtml += '</ul>';
+  document.getElementById('panel-incluso').innerHTML = inclusoHtml;
+
+  let procHtml = '<div class="timeline">';
+  s.processo.forEach((p, i) => {
+    procHtml += `<div class="timeline-item"><div class="timeline-dot">${i+1}</div><div class="timeline-content"><div class="timeline-title">${p.t}</div><div class="timeline-desc">${p.d}</div></div></div>`;
+  });
+  procHtml += '</div>';
+  document.getElementById('panel-processo').innerHTML = procHtml;
+
+  let tabHtml = '<table class="price-table"><thead><tr><th>Item</th><th>Prazo</th><th>Revisões</th><th>Valor</th></tr></thead><tbody>';
+  s.tabela.forEach((r, i) => {
+    tabHtml += `<tr><td>${r.item}</td><td>${r.prazo}</td><td>${r.revisoes}</td><td class="highlight">${r.preco}</td></tr>`;
+  });
+  tabHtml += '</tbody></table>';
+  document.getElementById('panel-valores').innerHTML = tabHtml;
+
+  document.querySelectorAll('.inner-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.inner-panel').forEach(p => p.classList.remove('active'));
+  document.querySelector('[data-panel="visao"]').classList.add('active');
+  document.getElementById('panel-visao').classList.add('active');
+
+  document.getElementById('modalOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function closeModalOutside(e) {
+  if (e.target === document.getElementById('modalOverlay')) closeModal();
+}
+
+document.querySelectorAll('.inner-tab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const panel = btn.dataset.panel;
+    document.querySelectorAll('.inner-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.inner-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('panel-' + panel).classList.add('active');
+  });
+});
+
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const filter = btn.dataset.filter;
+    document.querySelectorAll('.card').forEach(card => {
+      if (filter === 'todos' || card.dataset.category === filter) {
+        card.classList.add('visible');
+      } else {
+        card.classList.remove('visible');
+      }
+    });
+  });
+});
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+</script>
+</body>
+</html>
